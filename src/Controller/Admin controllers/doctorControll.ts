@@ -20,7 +20,9 @@ interface FileWithLocation extends Express.Multer.File {
 
 export const viewalldoctors = async (req: Request, res: Response, next: NextFunction) => {
 
+
     let { page = 1, limit = 8 } = req.query;
+
 
     page = Number(page);
     limit = Number(limit);
@@ -92,8 +94,6 @@ export const getdrDetails = async (req: Request, res: Response, next: NextFuncti
 
 
     const Details = await DrDetails.find({ doctor: req.params.id }).populate("doctor", "name email phone _id")
-
-
 
     if (!Details) {
         return next(new CustomError("there is no details find about this doctor", 404))
@@ -189,12 +189,15 @@ export const deleteDr = async (req: Request, res: Response, next: NextFunction) 
 export const addtokenPerDay = async (req: Request, res: Response, next: NextFunction) => {
     const id = req.user?.id
     const { tokenperday } = req.body
+
     const addtokennumber = new TokenPerDay({ doctorId: id, tokenPerDay: tokenperday })
+
     await addtokennumber.save()
     res.status(200).json({ status: true, message: "number of token add successfully", data: addtokennumber })
 }
 
 export const gettokenNumber = async (req: Request, res: Response, next: NextFunction) => {
+
     const { id } = req.params
 
     const totaltokens = await TokenPerDay.findOne({ doctorId: id })
@@ -216,4 +219,5 @@ export const edittokenPerDay = async (req: Request, res: Response, next: NextFun
     }
     res.status(200).json({ status: true, message: "number of token updated successfully", data: addtokennumber })
 }
+
 

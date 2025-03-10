@@ -49,8 +49,7 @@ export const docterRegistration = async (
       phone,
    });
    await newDoctor.save();
-   console.log(newDoctor);
-   
+
 
    res.status(200).json({
       error: false,
@@ -58,7 +57,7 @@ export const docterRegistration = async (
       msg: "User registered successfully. Please check your email for the OTP.",
       data: newDoctor,
    });
-   
+
 };
 
 

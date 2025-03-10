@@ -1,6 +1,8 @@
+
 import { Request, Response, NextFunction } from "express";
 import CustomError from "../../utils/CustomError";
 import Volunteer from "../../Models/Volunteer";
+
 
 interface file extends Express.Multer.File {
     fieldname: string;
@@ -12,6 +14,7 @@ interface file extends Express.Multer.File {
     key: string;
     acl: string;
     contentType: string;
+
     location: string;
 }
 
@@ -43,6 +46,7 @@ export const getVolunteers = async (
 ) => {
     const page = Number(req.query.page);
     const limit = Number(req.query.limit);
+
 
     if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
         return next(new CustomError("Invalid pagination parameters", 400));

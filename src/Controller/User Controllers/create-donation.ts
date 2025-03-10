@@ -1,6 +1,7 @@
 import Razorpay from "razorpay";
 import { NextFunction, Request, Response } from "express";
 import Donation from "../../Models/Donation";
+
 import CustomError from "../../utils/CustomError";
 
 const razorpay = new Razorpay({
@@ -105,6 +106,7 @@ export const allDonations = async (req: Request, res: Response) => {
     totalDonations: {
       general: totalGeneral,
       equipment: totalEquipment,
+
       total: totalDonation,
     },
   });
@@ -122,10 +124,12 @@ export const getAllDonations = async (
     return next(new CustomError("deatils not found", 404));
   }
 
+
   res.status(200).json({
     success: true,
     data: donations,
   });
+
 };
 
 export const getUserReceipt = async (
@@ -140,10 +144,12 @@ export const getUserReceipt = async (
 
   if (!donation) {
     return next(new CustomError("deatils not found", 404));
+
   }
 
   res.status(200).json({
     success: true,
+
     data: donation,
   });
 };
@@ -165,3 +171,4 @@ export const getAllDonationsById = async (
     data: donation,
   });
 };
+

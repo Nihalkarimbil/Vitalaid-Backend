@@ -106,6 +106,7 @@ export const updaterequest = async (
 };
 
 
+
 export const totalEquipment = async (
   req: Request,
   res: Response,
