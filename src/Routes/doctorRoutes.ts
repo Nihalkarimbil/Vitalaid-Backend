@@ -15,7 +15,7 @@ const routes = express.Router()
 routes
 
     .get('/getdoctors', adminAuth, tryCatch(getDoctors))
-    .get('/getAllDoctors', userAuth, tryCatch(getallDetails))
+    .get('/getAllDoctors', tryCatch(getallDetails))
 
     .get('/getDoctorsById/:id', adminAuth, tryCatch(getDoctersById))
     .get('/getDoctorById/:id', tryCatch(getDoctersById))
