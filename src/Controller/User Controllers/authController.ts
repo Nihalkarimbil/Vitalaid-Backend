@@ -39,6 +39,7 @@ export const docterRegistration = async (
    next: NextFunction
 ) => {
    const { name, email, password, phone } = req.body;
+
    const hashedPassword = await bcrypt.hash(password, 6);
 
    const newDoctor = await new Doctor({
@@ -56,6 +57,7 @@ export const docterRegistration = async (
       msg: "User registered successfully. Please check your email for the OTP.",
       data: newDoctor,
    });
+
 };
 
 

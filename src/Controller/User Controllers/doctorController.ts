@@ -2,9 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import Doctor from "../../Models/Doctor";
 import CustomError from "../../utils/CustomError";
 import DrDetails from "../../Models/DoctorDetails";
-import Slot from "../../Models/Slotes";
+
 import Token from "../../Models/token";
-import dayjs from "dayjs";
+import TokenPerDay from "../../Models/totalToken";
+import Review from "../../Models/Review";
+import UserDetails from "../../Models/Userdetails";
+
 
 export const getDoctors = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -70,7 +73,9 @@ export const getDoctersByIdfordoctor = async (req: Request, res: Response, next:
 
 export const getallTokens = async (req: Request, res: Response, next: NextFunction) => {
     const {id}=req.params
-    const tokens = await Token.find({doctorId:id}).populate("patientId","name email phone")
+
+    const tokens = await Token.find({doctorId:id,isVerified:true}).populate("patientId","name email phone")
+
 
     if (!tokens) {
         return next(new CustomError('tokens not available'))
@@ -79,16 +84,36 @@ export const getallTokens = async (req: Request, res: Response, next: NextFuncti
     res.status(200).json({ status: true, message: 'all tokens', data: tokens })
 }
 
-export const getallTokensofEachDoctor = async (req: Request, res: Response, next: NextFunction) => {
-    const id=req.user?.id
-    const{date}=req.query 
-   
-    const tokens = await Token.find({doctorId:id,date:date}).populate("patientId","name email phone profileImage")
-    if (!tokens) {
-        return next(new CustomError('tokens not available'))
-    }  
-    res.status(200).json({ status: true, message: 'all tokens', data: tokens })
-}
+
+export const getallTokensofEachDoctor = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.user || !req.user.id) {
+        res.status(401).json({ status: false, message: "Unauthorized access" });
+        return;
+    }
+
+    const doctorId = req.user.id;
+    const { date } = req.query;
+
+    if (!date) {
+        res.status(400).json({ status: false, message: "Date is required" });
+        return;
+    }
+
+    const tokens = await Token.find({
+        doctorId,
+        date,
+        isVerified: true,
+    }).populate("patientId", "name email phone profileImage").lean().exec();
+
+    if (!tokens || tokens.length === 0) {
+        res.status(404).json({ status: false, message: "No tokens found" });
+        return;
+    }
+
+    res.status(200).json({ status: true, message: "All tokens", data: tokens });
+};
+
+
 
 export const editTokenStatus=async(req: Request, res: Response, next: NextFunction)=>{
    console.log('jsdvchgs');
@@ -124,5 +149,48 @@ export const searchDoctors = async (req: Request, res: Response) => {
     res.status(200).json({ doctors, specialties });
   };
 
+  export const addTokenPerDay=async(req: Request, res: Response)=>{
+    const id=req.user?.id
+    const {numberoftoken}=req.body
+    const newtokennumber=await TokenPerDay.findByIdAndUpdate(id,{tokenPerDay:numberoftoken},{new:true})
+    res.status(200).json({status:true,message:"token number updated",data:newtokennumber})
+  }
 
+
+  export const getReviewForDoctors = async (req: Request, res: Response, next: NextFunction) => {
+    const id= req.user?.id
+  
+    if (!id) {
+      return next(new CustomError("Doctor id is not provided"));
+    }
+  
+    const reviews = await Review.find({ doctorId: id, isDeleted: false })
+      .populate("userId", "name")
+      .lean();
+  
+    if (!reviews.length) {
+      return next(new CustomError("Reviews not found"));
+    }
+  
+    const userIds = reviews.map(review => review.userId._id.toString());
+    const userDetails = await UserDetails.find({ user: { $in: userIds } }, "user profileImage").lean();
+  
+    const userProfileMap = new Map(
+      userDetails.map(user => [user.user.toString(), user?.profileImage?.originalProfile])
+    );
+  
+    const updatedReviews = reviews.map(review => ({
+      ...review,
+      userId: {
+        ...review.userId,
+        profileImage: userProfileMap.get(review.userId._id.toString()) || null
+      }
+    }));
+  
+    res.status(200).json({
+      status: true,
+      message: "Doctor reviews",
+      data: updatedReviews
+    });
+  }
 

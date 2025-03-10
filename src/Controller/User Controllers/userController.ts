@@ -6,9 +6,11 @@ import Token from "../../Models/token";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
 import Doctor from "../../Models/Doctor";
-import path from "path";
+
 import DrDetails, { DrDetailsType } from "../../Models/DoctorDetails";
-import { DoctorType } from "../../Models/Doctor";
+import sendEmail from "../../utils/emailService";
+import Review from "../../Models/Review";
+
 import UserDetails from "../../Models/Userdetails";
 
 interface DoctorPopulated {
@@ -16,7 +18,9 @@ interface DoctorPopulated {
   name: string;
   email: string;
   phone: string;
-  drDetails?: DrDetailsType | null;
+
+  drDetails?: DrDetailsType | null
+
 }
 
 interface TokenWithDoctor {
@@ -70,27 +74,36 @@ export const getblockedUsers = async (
 
   res.status(200).json({ users: users });
 };
+
+
+
 export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  const medHistory = await MedHistory.find({ User: id })
-      .populate("User", "name email phone").lean();
+  console.log('id:', id);
 
-  if (!medHistory || medHistory.length === 0) {
-      return next(new CustomError("User not found", 404));
-  }
+  const medHistory = await MedHistory.find({ User: id })
+    .populate("User", "name email phone")
+    .lean();
 
   const userDetails = await UserDetails.findOne({ user: id }).lean();
 
+  const user = await User.findOne({ _id: id }).lean();
+
+  if (!user) {
+    return next(new CustomError("User not found", 404));
+  }
   if (!userDetails) {
-      return next(new CustomError("User details not found", 404));
+    return next(new CustomError("User details not found", 404));
   }
 
-  const result = { medHistory, userDetails };
+ 
+  const result = { medHistory, userDetails, user };
 
   res.status(200).json({
-      status: true,
-      message: "User medical history and details",
-      data: result,
+    status: true,
+    message: "User medical history and details",
+    data: result,
+
   });
 };
 
@@ -156,7 +169,9 @@ export const getDetails = async (
   if (!userDetails) {
     return next(new CustomError("No Details found for this user", 404));
   }
-  res.status(200).json( userDetails );
+
+  res.status(200).json(userDetails);
+
 };
 
 type editDatas = {
@@ -176,9 +191,11 @@ export const editDetails = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { age, occupation, address, gender, bloodgroup, profileImage } =
+
+  const {id, age, occupation, address, gender, bloodgroup, profileImage } =
     req.body;
-  const userId = req.user?.id;
+  const userId = id;
+  
 
   const updateData: editDatas = {
     age,
@@ -209,125 +226,7 @@ export const editDetails = async (
   });
 };
 
-export const searchDoctors = async (req: Request, res: Response) => {
-  const doctors = await Doctor.find();
-  const specialties = await DrDetails.find();
 
-  res.status(200).json({ doctors, specialties });
-};
-
-export const createToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  const { date, doctorId, tokenNumber } = req.body;
-  const patientId = req.user?.id;
-
-  if (!patientId) {
-    return next(new CustomError("Patient ID is required"));
-  }
-
-  const patientObjectId = new mongoose.Types.ObjectId(patientId);
-  const doctorObjectId = new mongoose.Types.ObjectId(doctorId);
-
-  const oldToken = await Token.findOne({
-    patientId: patientObjectId,
-    date: date,
-    doctorId: doctorObjectId,
-    tokenNumber: tokenNumber,
-  });
-
-  if (oldToken) {
-    return next(new CustomError("This token is already booked"));
-  }
-
-  // Create new token
-  const newToken = new Token({
-    date,
-    doctorId: doctorObjectId,
-    tokenNumber,
-    patientId: patientObjectId,
-  });
-
-  await newToken.save();
-  const io: Server = req.app.get("io");
-  io.emit("tokenUpdated", newToken);
-  res.status(200).json({
-    status: true,
-    message: "Token created successfully",
-    data: newToken,
-  });
-};
-
-export const getallTokenByUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  console.log("Fetching tokens for user...");
-
-  const id = req.user?.id;
-  const { date } = req.query;
-
-  console.log("User ID:", id, "Date:", date);
-
-  const tokens = (await Token.find({ patientId: id, date: date })
-    .populate<{ doctorId: DoctorPopulated }>("doctorId", "name email phone")
-    .lean()) as TokenWithDoctor[];
-
-  if (!tokens || tokens.length === 0) {
-    return next(new CustomError("Tokens not available."));
-  }
-
-  await Promise.all(
-    tokens.map(async (token) => {
-      if (token.doctorId?._id) {
-        const drDetails = await DrDetails.findOne({
-          doctor: token.doctorId._id,
-        })
-          .select(
-            "qualification specialization availability profileImage description hospital address certificates"
-          )
-          .lean();
-        token.doctorId.drDetails = drDetails || null;
-      }
-    })
-  );
-
-  console.log(
-    "Tokens fetched with DrDetails:",
-    JSON.stringify(tokens, null, 2)
-  );
-
-  res.status(200).json({
-    status: true,
-    message: "User's tokens fetched successfully.",
-    data: tokens,
-  });
-};
-
-export const getTokenByUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const id = req.params.id;
-
-  const tokens = (await Token.find({ patientId: id })
-    .populate<{ doctorId: DoctorPopulated }>("doctorId", "name email phone")
-    .lean()) as TokenWithDoctor[];
-
-  if (!tokens || tokens.length === 0) {
-    return next(new CustomError("Tokens not available."));
-  }
-
-  res.status(200).json({
-    status: true,
-    message: "User's tokens fetched successfully.",
-    data: tokens,
-  });
-};
 
 export const getUsersUpdatedToday = async (req: Request, res: Response):Promise <void> => {
   const now = new Date();
@@ -348,3 +247,50 @@ export const getUsersUpdatedToday = async (req: Request, res: Response):Promise 
     date: startOfDay.toISOString().split("T")[0],
   });
 };
+
+
+
+
+export const getReview = async (req: Request, res: Response, next: NextFunction) => {
+  const {id} = req.params
+
+  if (!id) {
+    return next(new CustomError("Doctor id is not provided"));
+  }
+
+  const reviews = await Review.find({ doctorId: id, isDeleted: false })
+    .populate("userId", "name")
+    .lean();
+
+  if (!reviews.length) {
+    return next(new CustomError("Reviews not found"));
+  }
+
+  const userIds = reviews.map(review => review.userId._id.toString());
+  const userDetails = await UserDetails.find({ user: { $in: userIds } }, "user profileImage").lean();
+
+  const userProfileMap = new Map(
+    userDetails.map(user => [user.user.toString(), user?.profileImage?.originalProfile])
+  );
+
+  const updatedReviews = reviews.map(review => ({
+    ...review,
+    userId: {
+      ...review.userId,
+      profileImage: userProfileMap.get(review.userId._id.toString()) || null
+    }
+  }));
+
+  res.status(200).json({
+    status: true,
+    message: "Doctor reviews",
+    data: updatedReviews
+  });
+}
+
+export const deleteReview = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params
+  const deletedreciew = await Review.findByIdAndUpdate(id, { isDeleted: true }, { new: true })
+  res.status(200).json({ status: true, message: "review deleted successfully", data: deleteReview })
+}
+
