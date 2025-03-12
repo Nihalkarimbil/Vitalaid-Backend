@@ -2,12 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import Doctor from "../../Models/Doctor";
 import CustomError from "../../utils/CustomError";
 import DrDetails from "../../Models/DoctorDetails";
-
 import Token from "../../Models/token";
 import TokenPerDay from "../../Models/totalToken";
 import Review from "../../Models/Review";
 import UserDetails from "../../Models/Userdetails";
-
 
 export const getDoctors = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -76,14 +74,12 @@ export const getallTokens = async (req: Request, res: Response, next: NextFuncti
 
     const tokens = await Token.find({doctorId:id,isVerified:true}).populate("patientId","name email phone")
 
-
     if (!tokens) {
         return next(new CustomError('tokens not available'))
     }
 
     res.status(200).json({ status: true, message: 'all tokens', data: tokens })
 }
-
 
 export const getallTokensofEachDoctor = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (!req.user || !req.user.id) {
@@ -112,8 +108,6 @@ export const getallTokensofEachDoctor = async (req: Request, res: Response, next
 
     res.status(200).json({ status: true, message: "All tokens", data: tokens });
 };
-
-
 
 export const editTokenStatus=async(req: Request, res: Response, next: NextFunction)=>{
    console.log('jsdvchgs');
@@ -192,5 +186,6 @@ export const searchDoctors = async (req: Request, res: Response) => {
       message: "Doctor reviews",
       data: updatedReviews
     });
+
   }
 

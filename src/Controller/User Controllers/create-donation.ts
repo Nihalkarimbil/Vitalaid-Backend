@@ -106,7 +106,6 @@ export const allDonations = async (req: Request, res: Response) => {
     totalDonations: {
       general: totalGeneral,
       equipment: totalEquipment,
-
       total: totalDonation,
     },
   });
@@ -123,7 +122,6 @@ export const getAllDonations = async (
   if (!donations) {
     return next(new CustomError("deatils not found", 404));
   }
-
 
   res.status(200).json({
     success: true,

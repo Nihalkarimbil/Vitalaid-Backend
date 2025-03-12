@@ -22,6 +22,7 @@ export const userRegistration = async (
       password: hashedPassword,
       phone,
    });
+
    await newUser.save();
 
    res.status(200).json({
@@ -50,14 +51,12 @@ export const docterRegistration = async (
    });
    await newDoctor.save();
 
-
    res.status(200).json({
       error: false,
       status: true,
       msg: "User registered successfully. Please check your email for the OTP.",
       data: newDoctor,
    });
-
 };
 
 

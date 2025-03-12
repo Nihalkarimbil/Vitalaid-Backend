@@ -6,7 +6,6 @@ export const app: Application = express();
 export const server = http.createServer(app);
 
 export const io = new Server(server, {
-
   cors: {
     origin: process.env.FRONTEND_URI,
     methods: ["GET", "POST", "PUT"],

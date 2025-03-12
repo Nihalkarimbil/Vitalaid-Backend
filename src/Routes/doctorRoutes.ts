@@ -8,21 +8,17 @@ import { addDetails, addtokenPerDay, deleteDr, editDetails, edittokenPerDay, get
 import {  getUserById } from "../Controller/User Controllers/userController";
 import { adduserReview, getReview, getUsersReview } from "../Controller/User Controllers/ReviewController";
 
-
-
 const routes = express.Router()
 
 routes
 
     .get('/getdoctors', adminAuth, tryCatch(getDoctors))
     .get('/getAllDoctors', tryCatch(getallDetails))
-
     .get('/getDoctorsById/:id', adminAuth, tryCatch(getDoctersById))
     .get('/getDoctorById/:id', tryCatch(getDoctersById))
     .post("/postdetailsof", adminAuth,  tryCatch(addDetails))
     .get("/getDetailsof/:id", adminAuth, tryCatch(getdrDetails))
     .get("/getdetail/:id", tryCatch(getdrDetails))
-
     .put("/editdetailsof/:id", adminAuth, upload.fields([{ name: "profileImage", maxCount: 1 }, { name: "certificates", maxCount: 5 }]), tryCatch(editDetails))
     .put("/deletedr/:id", adminAuth, tryCatch(deleteDr))
     .get("/getdoctorsprofile", doctorAuth, tryCatch(getDoctersByIdfordoctor))
@@ -33,14 +29,11 @@ routes
     .put('/updatetoken/:id', doctorAuth,tryCatch(editTokenStatus))
     .put('/updateavailability',doctorAuth,tryCatch(editAvailability))
     .get('/searchDoctors',tryCatch(searchDoctors))
-
     .post('/adddatetokennumber',doctorAuth,tryCatch(addtokenPerDay))
     .put('/updatetokennumber',doctorAuth,tryCatch(edittokenPerDay))
     .get("/getallreview",doctorAuth,tryCatch(getReviewForDoctors))
     .get('/getUserById/:id',doctorAuth, tryCatch(getUserById))
     .post("/adduserreview",doctorAuth,tryCatch(adduserReview))
     .get("/getuserreview/:id",doctorAuth,tryCatch(getUsersReview))
-
-
 
 export default routes

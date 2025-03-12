@@ -30,10 +30,7 @@ const tokenSchema:Schema<tokentype>=new Schema({
         tokenNumber:{type:Number,required:true},
         otp:{type:String,required:false,default:null},
         isVerified:{type:Boolean,required:true,default:false}
-
-
-        
-        
+                
 })
 const Token=mongoose.model<tokentype>("Token",tokenSchema)
 export default Token

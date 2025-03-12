@@ -20,7 +20,6 @@ interface DoctorPopulated {
   phone: string;
 
   drDetails?: DrDetailsType | null
-
 }
 
 interface TokenWithDoctor {
@@ -74,7 +73,6 @@ export const getblockedUsers = async (
 
   res.status(200).json({ users: users });
 };
-
 
 
 export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
@@ -195,8 +193,7 @@ export const editDetails = async (
   const {id, age, occupation, address, gender, bloodgroup, profileImage } =
     req.body;
   const userId = id;
-  
-
+ 
   const updateData: editDatas = {
     age,
     occupation,
@@ -292,5 +289,6 @@ export const deleteReview = async (req: Request, res: Response, next: NextFuncti
   const { id } = req.params
   const deletedreciew = await Review.findByIdAndUpdate(id, { isDeleted: true }, { new: true })
   res.status(200).json({ status: true, message: "review deleted successfully", data: deleteReview })
+
 }
 

@@ -13,10 +13,8 @@ import { gettokenNumber } from '../Controller/Admin controllers/doctorControll'
 import { editTokenStatus, getallTokens } from '../Controller/User Controllers/doctorController'
 import { getmsgusr, msgtodr, newMessages } from '../Controller/Admin controllers/adminController'
 import { getmessagedusers, getmsgs, postchat } from '../Controller/User Controllers/messagecontroller'
-
 import {  addReview, deleteReview, getReview, getUsersReviewforusers } from '../Controller/User Controllers/ReviewController'
 import { createToken, getallTokenByUser, getTokenByUser, otpVerification } from '../Controller/User Controllers/tokenController'
-
 
 const userRoutes = express.Router()
 
@@ -29,7 +27,8 @@ userRoutes
     .post('/addrequest', userAuth, tryCatch(makeRequest))
     .get('/userrequest', userAuth, tryCatch(getRequestbyuser))
     .delete('/deleterequest/:equipment', userAuth, tryCatch(removeRequest))
-    .get('/getallequipment',  tryCatch(getAllEquipments))
+    .get('/getallequipment', tryCatch(getAllEquipments))
+
     .post("/addDetails/:id", userAuth, tryCatch(addDetails))
     .get("/getdetails/:id", tryCatch(getDetails))
     .post("/generatereport", tryCatch(generateReport))
@@ -44,22 +43,17 @@ userRoutes
     .get("/msgof/:doctorId", tryCatch(getmessagedusers))
     .put("/editdetailsofthe",userAuth, tryCatch(editDetails))
     .post('/createtoken', userAuth, validateData(tokenValidationSchema), tryCatch(createToken))
-
     .put("/otpverification",userAuth,tryCatch(otpVerification))
-
     .get("/gettokenperday/:id", userAuth, tryCatch(gettokenNumber))
     .get("/getalltokens/:id",userAuth,tryCatch(getallTokens))
     .get("/getalltoken", userAuth, tryCatch(getallTokenByUser))
     .put("/canceltoken/:id", userAuth, tryCatch(editTokenStatus))
-
     .post("/addreview",userAuth,tryCatch(addReview))
     .get("/getallreview/:id",userAuth,tryCatch(getReview))
     .put("/deletereview/:id",userAuth,tryCatch(deleteReview))    
     .get("/getalltokenofuser/:id", userAuth, tryCatch(getTokenByUser))
     .get("/getloginedCount", tryCatch(getUsersUpdatedToday))
     .get("/getuserreview",userAuth,tryCatch(getUsersReviewforusers))
-
-
 
 export default userRoutes;
 
