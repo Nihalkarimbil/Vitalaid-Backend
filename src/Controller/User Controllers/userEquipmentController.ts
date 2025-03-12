@@ -105,7 +105,6 @@ export const updaterequest = async (
     .json({ error: false, message: "request updated", data: updatedrequest });
 };
 
-
 export const totalEquipment = async (
   req: Request,
   res: Response,

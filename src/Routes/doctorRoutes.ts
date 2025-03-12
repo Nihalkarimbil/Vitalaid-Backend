@@ -1,12 +1,12 @@
 import express from "express";
 import tryCatch from "../utils/tryCatch";
+
 import { editAvailability, editTokenStatus, getDoctersById, getDoctersByIdfordoctor, getDoctors, getReviewForDoctors, getallTokens, getallTokensofEachDoctor, searchDoctors } from "../Controller/User Controllers/doctorController";
 import { adminAuth, doctorAuth, userAuth } from "../Middleware/authMiddleware";
 import { upload } from "../Middleware/ImageUpload";
 import { addDetails, addtokenPerDay, deleteDr, editDetails, edittokenPerDay, getallDetails, getdrDetails, gettokenNumber } from "../Controller/Admin controllers/doctorControll";
 import {  getUserById } from "../Controller/User Controllers/userController";
 import { adduserReview, getReview, getUsersReview } from "../Controller/User Controllers/ReviewController";
-
 
 const routes = express.Router()
 
@@ -35,6 +35,5 @@ routes
     .get('/getUserById/:id',doctorAuth, tryCatch(getUserById))
     .post("/adduserreview",doctorAuth,tryCatch(adduserReview))
     .get("/getuserreview/:id",doctorAuth,tryCatch(getUsersReview))
-
 
 export default routes

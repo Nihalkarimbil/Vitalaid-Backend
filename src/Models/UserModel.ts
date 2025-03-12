@@ -1,3 +1,4 @@
+
 import mongoose, { Document, Schema, model } from "mongoose";
 
 interface UserType extends Document {
@@ -9,12 +10,14 @@ interface UserType extends Document {
   isDeleted: boolean;
   blocked: boolean;
   User: mongoose.ObjectId;
+
 }
 
 const userSchema: Schema<UserType> = new Schema(
   {
     name: { type: String },
     User: {
+
       type: mongoose.Types.ObjectId,
       ref: "UserDetails",
     },
@@ -22,6 +25,7 @@ const userSchema: Schema<UserType> = new Schema(
     password: { type: String, required: true },
     admin: { type: Boolean, default: false },
     phone: { type: String },
+
     isDeleted: { type: Boolean, default: false },
     blocked: { type: Boolean, default: false },
   },
@@ -31,3 +35,4 @@ const userSchema: Schema<UserType> = new Schema(
 const User = mongoose.model<UserType>("User", userSchema);
 
 export default User;
+

@@ -6,9 +6,11 @@ import Token from "../../Models/token";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
 import Doctor from "../../Models/Doctor";
+
 import DrDetails, { DrDetailsType } from "../../Models/DoctorDetails";
 import sendEmail from "../../utils/emailService";
 import Review from "../../Models/Review";
+
 import UserDetails from "../../Models/Userdetails";
 
 interface DoctorPopulated {
@@ -16,6 +18,7 @@ interface DoctorPopulated {
   name: string;
   email: string;
   phone: string;
+
   drDetails?: DrDetailsType | null
 }
 
@@ -98,6 +101,7 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
     status: true,
     message: "User medical history and details",
     data: result,
+
   });
 };
 
@@ -163,7 +167,9 @@ export const getDetails = async (
   if (!userDetails) {
     return next(new CustomError("No Details found for this user", 404));
   }
+
   res.status(200).json(userDetails);
+
 };
 
 type editDatas = {
@@ -183,10 +189,11 @@ export const editDetails = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+
   const {id, age, occupation, address, gender, bloodgroup, profileImage } =
     req.body;
   const userId = id;
-  
+ 
   const updateData: editDatas = {
     age,
     occupation,
@@ -282,4 +289,6 @@ export const deleteReview = async (req: Request, res: Response, next: NextFuncti
   const { id } = req.params
   const deletedreciew = await Review.findByIdAndUpdate(id, { isDeleted: true }, { new: true })
   res.status(200).json({ status: true, message: "review deleted successfully", data: deleteReview })
+
 }
+

@@ -71,6 +71,7 @@ export const getDoctersByIdfordoctor = async (req: Request, res: Response, next:
 
 export const getallTokens = async (req: Request, res: Response, next: NextFunction) => {
     const {id}=req.params
+
     const tokens = await Token.find({doctorId:id,isVerified:true}).populate("patientId","name email phone")
 
     if (!tokens) {
@@ -107,7 +108,6 @@ export const getallTokensofEachDoctor = async (req: Request, res: Response, next
 
     res.status(200).json({ status: true, message: "All tokens", data: tokens });
 };
-
 
 export const editTokenStatus=async(req: Request, res: Response, next: NextFunction)=>{
    console.log('jsdvchgs');
@@ -186,4 +186,6 @@ export const searchDoctors = async (req: Request, res: Response) => {
       message: "Doctor reviews",
       data: updatedReviews
     });
+
   }
+
